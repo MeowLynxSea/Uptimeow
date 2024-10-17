@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <!-- 设置文档编码和视口 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uptimeow</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- 引入 htmx JS -->
+    <script src="/js/htmx.min.js"></script>
+    <!-- 引入 highlight.js CSS -->
+    <link rel="stylesheet" href="/css/highlight.js/monokai-sublime.css">
+    <!-- 引入 highlight.js JS -->
+    <script src="/js/highlight.min.js"></script>
+    <!-- 引入自定义样式 -->
+    <link href="/css/meowdream-better-links.css" rel="stylesheet">
+    <link href="/css/meowdream-colors.css" rel="stylesheet">
+    <link href="/css/meowdream-custom.css" rel="stylesheet">
+    <script src="/js/meowdream-fetch-fix.js"></script>
+
+    <style>
+    .col-md-8 {
+        width: 66.66666667%; /* Assuming it's a Bootstrap-like grid system */
+    }
+
+    .wrap {
+        padding: 7.5px 2.5px;
+        width: 100%;
+    }
+
+    .hp-bar-big {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .beat {
+        width: 10px;
+        height: 30px;
+        background-color: #33333370; /* Example color */
+        margin: 1px;
+        border-radius: 5px; /* Example border radius */
+        transition: transform 0.4s; /* For hover effect */
+    }
+
+    .beat-good {
+        background-color: #00ff7770;
+    }
+
+    .beat-slightly-slow {
+        background-color: #ffd90070;
+    }
+
+    .beat-slow {
+        background-color: #ff990070;
+    }
+
+    .beat-very-slow {
+        background-color: #ff800070;
+    }
+
+    .beat-danger {
+        background-color: #ff5e0070;
+    }
+
+    .beat-dead {
+        background-color: #ff000070;
+    }
+
+    .beat:hover {
+        transform: scale(1.25);
+    }
+
+    .word {
+        color: #333; /* Example color */
+        font-size: 14px;
+    }
+
+    .connecting-line {
+        height: 1px;
+        background-color: #333; /* Example color */
+        flex-grow: 1;
+    }
+
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-between {
+        justify-content: space-between;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#"><span style="padding-right: 8px;"></span>Uptimeow</a>
+                    
+                    <div class="collapse navbar-collapse" id="navbarColor01">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">状态
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="/about.html">关于</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">其他</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">按时间查询</a>
+                            <a class="dropdown-item" href="#">报修</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">清空数据</a>
+                        </div>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+                </nav>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+                <h1><br></h1>
+                <h1 id="server-name">
+                </h1>
+                <p id="server-address">
+                </p>
+                <p>
+                    <a class="btn btn-md" href="#" id="server-website">主页 »</a><br><br>
+                </p>
+                <h5 class="text" id="server-status">
+                    正在获取服务器状态...<br>
+                </h5>
+                <div class="btn-group btn-group-sm" role="group">
+                     
+                    <button class="btn btn-secondary" type="button">
+                        暂停
+                    </button> 
+                    <button class="btn btn-secondary" type="button">
+                        刷新
+                    </button> 
+                    <button class="btn btn-secondary" type="button">
+                        反馈
+                    </button>
+                </div>
+                <p />
+                <p id="server-description">
+                    
+                </p>
+                
+
+                <div class="wrap">
+                    <div class="hp-bar-big" id="status-bar"></div>
+                    <div class="d-flex justify-content-between align-items-center word">
+                        <div id="left-time">10m ago</div>
+                        <div class="connecting-line"></div>
+                        <div id="right-time">now</div>
+                    </div>
+                </div>
+                <span class="word">检测频率 10 秒</span>
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- 引入 Bootstrap JS -->
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <!-- 引入 marked JS -->
+    <script src="/js/marked.min.js"></script>
+    <!-- 引入自定义 Markdown 渲染器 -->
+    <script src="/js/meowdream-custom-md-renderer.js"></script>
+
+    <script src="/js/meowdream-utils.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 发起请求
+            fetch('/api?type=server_info')
+                .then(response => {
+                    // 检查响应状态
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Network response was not ok.');
+                    }
+                })
+                .then(data => {
+                    // 检查返回的code是否为200
+                    if (data.code === 200) {
+                        // 填充数据到HTML元素
+                        document.getElementById('server-name').textContent = data.data.server_name;
+                        document.getElementById('server-address').textContent = data.data.server_address;
+                        document.getElementById('server-website').href = data.data.server_website;
+                        document.getElementById('server-description').textContent += data.data.server_description;
+                    } else {
+                        console.error('Failed to load server info:', data);
+                    }
+                })
+                .catch(error => {
+                    // 处理请求过程中发生的错误
+                    console.error('Fetch error:', error);
+                });
+        });
+    </script>
+    <script>
+        function removeTandZ(dateTimeStr) {
+            return dateTimeStr.replace('T', ' ').replace('Z', '');
+        }
+
+        // 记录网页加载完成的时间
+        let recordedTime = new Date().toLocaleString();
+        let tempTime;
+        var intervalId = null;
+        console.log("网页加载完成，当前时间：" + recordedTime);
+
+        function updateStatus() {
+            intervalId = setInterval(function() {
+                try {
+                    console.log("发送定期消息。");
+                    let recordedTime = new Date(new Date().getTime() - 5000).toLocaleString();
+                    // 假设 ws.send 可能会失败，并且会抛出一个错误
+                    ws.send("later than " + recordedTime);
+                } catch (error) {
+                    console.error("消息发送失败:", error);
+                    // 发送失败，清除定时器
+                    clearInterval(intervalId);
+                    // 可以在这里执行其他清理工作
+                }
+            }, 10000);
+        }
+
+        let ws;
+        function connect(){
+            let statusBar = document.getElementById("status-bar");
+            
+            console.log("WebSocket连接尝试中...");
+            while(statusBar.childElementCount > 0){
+                statusBar.removeChild(statusBar.firstChild);
+            }
+            for(i = 0; i < 60; i++){
+                let newDiv = document.createElement("div");
+                newDiv.className = "beat";
+                newDiv.title = `无数据`;
+                statusBar.appendChild(newDiv);
+            }
+            ws = new WebSocket("/ws");
+            let recordedTime = new Date(new Date().getTime() - 5000).toLocaleString();
+
+            ws.onopen = function() {
+                // 连接成功时发送消息并更新时间
+                console.log("WebSocket连接成功，发送初始消息。");
+                try {
+                    ws.send("earlier than " + recordedTime);
+                } catch (error) {
+                    console.error("WebSocket初始消息发送失败:", error);
+                    return;
+                }
+                console.log("WebSocket初始消息发送成功。");
+                recordedTime = new Date().toLocaleString();
+                
+                updateStatus();
+            };
+
+            ws.onmessage = function(event) {
+                // 接收到服务器信息
+                console.log("收到服务器消息：" + event.data);
+                let data = JSON.parse(event.data);
+                if (data.code === 200) {
+                    let statusBar = document.getElementById("status-bar");
+                    // 如果data.data不为空
+                    // 遍历data中的元素
+                    data.data.forEach(function(item) {
+                        // 创建新的div
+                        let newDiv = document.createElement("div");
+                        newDiv.className = "beat";
+                        newDiv.title = `${removeTandZ(item.time)} TPS:${item.tps} Online: ${item.online_player}/${item.max_player}`;
+                        // 根据条件添加类
+                        if (!item.is_online) {
+                            newDiv.classList.add("beat-dead");
+                            newDiv.title = `${removeTandZ(item.time)} Offline`;
+                        } else if (item.tps <= 16) {
+                            newDiv.classList.add("beat-danger");
+                        } else if (item.tps <= 18) {
+                            newDiv.classList.add("beat-very-slow");
+                        } else if (item.tps <= 19) {
+                            newDiv.classList.add("beat-slow");
+                        } else if (item.tps <= 19.5) {
+                            newDiv.classList.add("beat-slightly-slow");
+                        } else {
+                            newDiv.classList.add("beat-good");
+                        }
+                        // 将新div添加到statusBar中
+                        statusBar.appendChild(newDiv);
+                        while(statusBar.childElementCount > 60){
+                            statusBar.removeChild(statusBar.firstChild);
+                        }
+                        document.getElementById('left-time').innerHTML = statusBar.firstChild.title.slice(0, 19);
+                        document.getElementById('right-time').innerHTML = statusBar.lastChild.title.slice(0, 19) + " (now)";
+                    });
+                    // 更新服务器状态
+                    let serverStatus = document.getElementById("server-status");
+                    serverStatus.className = "";
+                    if (data.data[data.data.length - 1].is_online) {
+                        serverStatus.classList.add("text", "text-success");
+                        serverStatus.textContent = "服务器正常运行中\n";
+                    } else {
+                        serverStatus.classList.add("text", "text-danger");
+                        serverStatus.textContent = "服务器状态异常\n";
+                    }
+                }
+            };
+
+            ws.onclose = function() {
+                // 连接断开时更新服务器状态
+                console.log("WebSocket连接已关闭。");
+                clearInterval(intervalId);
+                let serverStatus = document.getElementById("server-status");
+                serverStatus.className = "";
+                serverStatus.classList.add("text", "text-danger");
+                serverStatus.textContent = "与服务器的连接已断开\n";
+                // 3秒后重试连接
+                setTimeout(function() {
+                    console.log("尝试重新连接WebSocket...");
+                    connect();
+                }, 1000);
+            };
+
+            ws.onerror = function() {
+                // 连接出错时更新服务器状态
+                console.log("WebSocket连接出错。");
+                ws.close();
+                let serverStatus = document.getElementById("server-status");
+                serverStatus.className = "";
+                serverStatus.classList.add("text", "text-danger");
+                serverStatus.textContent = "与服务器的连接出错\n";
+            };
+        }
+
+        connect();
+    </script>
+</body>
+</html>

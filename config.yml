@@ -1,0 +1,27 @@
+web:
+  host: "localhost"
+  port: 25565
+
+rcon:
+  host: "localhost"
+  port: 25575
+  password: "password"
+
+server_info:
+  name: "Demo"
+  address: "demo.meowdream.cn"
+  website: "https://uptimeow.meowdream.cn"
+  description: "Just a demo :)"
+
+warn:
+  enabled: true
+  dingtalkBot:
+    enabled: true
+    accessToken: "xxx"
+    secret: "xxx"
+    atMobile: "xxx"
+  enabledType:
+    lowTps: 
+      enabled: true
+      threshold: 19.0
+    offline: true

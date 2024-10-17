@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <!-- 设置文档编码和视口 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uptimeow</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- 引入 htmx JS -->
+    <script src="/js/htmx.min.js"></script>
+    <!-- 引入 highlight.js CSS -->
+    <link rel="stylesheet" href="/css/highlight.js/monokai-sublime.css">
+    <!-- 引入 highlight.js JS -->
+    <script src="/js/highlight.min.js"></script>
+    <!-- 引入自定义样式 -->
+    <link href="/css/meowdream-better-links.css" rel="stylesheet">
+    <link href="/css/meowdream-colors.css" rel="stylesheet">
+    <link href="/css/meowdream-custom.css" rel="stylesheet">
+    <script src="/js/meowdream-fetch-fix.js"></script>
+
+    <style>
+    .col-md-8 {
+        width: 66.66666667%; /* Assuming it's a Bootstrap-like grid system */
+    }
+
+    .wrap {
+        padding: 7.5px 2.5px;
+        width: 100%;
+    }
+
+    .hp-bar-big {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .beat {
+        width: 10px;
+        height: 30px;
+        background-color: #33333370; /* Example color */
+        margin: 3px;
+        border-radius: 5px; /* Example border radius */
+        transition: transform 0.4s; /* For hover effect */
+    }
+
+    .beat-good {
+        background-color: #00ff7770;
+    }
+
+    .beat-slightly-slow {
+        background-color: #ffd90070;
+    }
+
+    .beat-slow {
+        background-color: #ff990070;
+    }
+
+    .beat-very-slow {
+        background-color: #ff800070;
+    }
+
+    .beat-danger {
+        background-color: #ff5e0070;
+    }
+
+    .beat-dead {
+        background-color: #ff000070;
+    }
+
+    .beat:hover {
+        transform: scale(1.25);
+    }
+
+    .word {
+        color: #333; /* Example color */
+        font-size: 14px;
+    }
+
+    .connecting-line {
+        height: 1px;
+        background-color: #333; /* Example color */
+        flex-grow: 1;
+    }
+
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-between {
+        justify-content: space-between;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+    </style>
+</head>
+
+<body>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#"><span style="padding-right: 8px;"></span>Uptimeow</a>
+                    
+                    <div class="collapse navbar-collapse" id="navbarColor01">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">状态</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link active" href="#">关于
+                            <span class="visually-hidden">(current)</span>
+                        </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">其他</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">按时间查询</a>
+                            <a class="dropdown-item" href="#">报修</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">清空数据</a>
+                        </div>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+                </nav>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+                <div class="page-header">
+                    <h1>
+                        <br>
+                        Uptimeow <small style="font-size: 50%">随时随地检查服务器状态！</small>
+                    </h1>
+                </div>
+                <hr>
+                <h2>
+                    简介
+                </h2>
+                <hr>
+                <p>
+                    你说得对，但是Uptimeow是一款专为Minecraft服务器设计的实时状态监控面板。它构建于一个精密的网络架构之上，为服务器管理员提供了一个被称作“数据之窗”的透明界面。在这里，关键的服务器参数将被实时监控，如同被神选中的人获得“神之眼”一般，Uptimeow赋予了你洞察服务器运行状态的能力。你将扮演一位细心的管理员，在这个高效的监控平台中，邂逅各种图表和数据，它们各具特色，共同讲述着服务器的健康状况。与Uptimeow一起，你将轻松应对各种挑战，确保服务器稳定运行，找回玩家们流畅游戏体验的同时——逐步发掘服务器性能的真相。
+                </p>
+                <p>
+                    <a class="btn" href="#">Learn more »</a>
+                    <a class="btn" href="#">Github »</a>
+                </p>
+                <hr>
+                <h2>
+                    功能
+                </h2>
+                <hr>
+                <h5>监控</h5>
+                <p>
+                    通过Uptimeow，您可以在线监控服务器的运行状态，如是否在线、TPS、在线人数等
+                </p>
+                <h5>历史记录</h5>
+                <p>
+                    您可以在线回溯过往的服务器状态记录，以便结合日志更好地排查问题
+                </p>
+                <h5>玩家反馈</h5>
+                <p>
+                    通过将本面板开放给玩家，玩家可以通过配置的方式及时联系管理组以报告服务器故障
+                </p>
+                <h5>报警</h5>
+                <p>
+                    您可以自定义配置消息推送服务，当服务器状态异常时，Uptimeow将会自动推送报警消息到您的手机，以便及时解决问题
+                </p>
+                <h5>加速管理</h5>
+                <p>
+                    通过消息推送服务，您也可以将服务器信息汇总推送至服务器管理/技术，以便优化游戏体验
+                </p>
+                <hr>
+                <h2>部署</h2>
+                <p>Uptimeow的部署非常简单。<br>
+                    1. 修改服务器配置，启用RCON，记下端口和密码<br>
+                    2. 下载Release版本，修改配置文件<br>
+                    3. 启动服务，访问面板<br>
+                </p>
+                <hr>
+                <h2>反馈</h2>
+                <p>欢迎向我们提交Uptimeow的错误，或对Uptimeow提出您的宝贵意见，您的反馈是我们前进的动力！</p>
+                <h5>反馈通道</h5>
+                <p>
+                    <b>Github issues</b> <a class="btn btn-sm" href="">前往 »</a><br>
+                    <b>电子邮件</b> <a class="btn btn-sm" href="mailto:Meowdream反馈<feedback@meowdream.cn>?cc=%E6%A2%A6%E5%87%8C%E6%B1%90%3Cmew%40meowdream.cn%3E&subject=Issues%20on%20Uptimeow">发送 »</a><br>
+                </p>
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- 引入 Bootstrap JS -->
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <!-- 引入 marked JS -->
+    <script src="/js/marked.min.js"></script>
+    <!-- 引入自定义 Markdown 渲染器 -->
+    <script src="/js/meowdream-custom-md-renderer.js"></script>
+
+    <script src="/js/meowdream-utils.js"></script>
+</body>
+</html>
